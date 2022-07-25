@@ -55,7 +55,7 @@ namespace osiris
         * @param thickness Circle thickness. Set to -1 to draw the disk inside the circle
         * @return void
         */
-        void drawCircle ( IplImage * pImage , const CvScalar & rColor = cvScalar(255) , int thickness = 1 ) ;
+        void drawCircle ( Mat  pImage , const CvScalar & rColor = cvScalar(255) , int thickness = 1 ) ;
 
 
 

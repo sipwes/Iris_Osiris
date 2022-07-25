@@ -28,8 +28,8 @@ namespace osiris
         // Do nothing
     }
 
-    void OsiProcessings::segment ( const IplImage * pSrc ,
-                                         IplImage * pMask ,
+    void OsiProcessings::segment ( const Mat  pSrc ,
+                                         Mat  pMask ,
                                          OsiCircle & rPupil ,
                                          OsiCircle & rIris ,
 										 vector<float> & rThetaCoarsePupil ,
@@ -128,7 +128,7 @@ namespace osiris
         detectPupil(pSrc,rPupil,minPupilDiameter,maxPupilDiameter) ;
 
         // Fill the holes in an area surrounding pupil
-        IplImage * clone_src = cvCloneImage(pSrc) ;
+        Mat  clone_src = cvCloneImage(pSrc) ;
         cvSetImageROI(clone_src,cvRect(rPupil.getCenter().x-3.0/4.0*maxIrisDiameter/2.0,
                                        rPupil.getCenter().y-3.0/4.0*maxIrisDiameter/2.0,
                                        3.0/4.0*maxIrisDiameter,
@@ -191,7 +191,7 @@ namespace osiris
         // Mask of pupil
         ////////////////
 
-        IplImage * mask_pupil = cvCloneImage(pSrc) ;
+        Mat  mask_pupil = cvCloneImage(pSrc) ;
         cvZero(mask_pupil) ;
         drawContour(mask_pupil,pupil_accurate_contour,cvScalar(255),-1) ;
 
@@ -225,7 +225,7 @@ namespace osiris
         // Mask of iris
         ///////////////
 
-        IplImage * mask_iris = cvCloneImage(mask_pupil) ;
+        Mat  mask_iris = cvCloneImage(mask_pupil) ;
         cvZero(mask_iris) ;
         drawContour(mask_iris,iris_coarse_contour,cvScalar(255),-1) ;
 
@@ -239,14 +239,14 @@ namespace osiris
         // mask = dilate(mask-iris) - dilate(mask_pupil)
 
         // Dilate mask of iris by a disk-shape element
-        IplImage * mask_iris2 = cvCloneImage(mask_iris) ;
+        Mat  mask_iris2 = cvCloneImage(mask_iris) ;
         IplConvKernel * struct_element = cvCreateStructuringElementEx(21,21,10,10,CV_SHAPE_ELLIPSE) ;
         //cvMorphologyEx(mask_iris2,mask_iris2,mask_iris2,struct_element,CV_MOP_DILATE) ;
         cvDilate(mask_iris2,mask_iris2,struct_element) ;
         cvReleaseStructuringElement(&struct_element) ;
 
         // Dilate the mask of pupil by a horizontal line-shape element
-        IplImage * mask_pupil2 = cvCloneImage(mask_pupil) ;
+        Mat  mask_pupil2 = cvCloneImage(mask_pupil) ;
         struct_element = cvCreateStructuringElementEx(21,21,10,1,CV_SHAPE_RECT) ;
         //cvMorphologyEx(mask_pupil2,mask_pupil2,mask_pupil2,struct_element,CV_MOP_DILATE) ;
         cvDilate(mask_pupil2,mask_pupil2,struct_element) ;
@@ -288,7 +288,7 @@ namespace osiris
         /////////////////////////////////////////
 
         // Build a safe area = avoid occlusions
-        IplImage * safe_area = cvCloneImage(mask_iris) ;
+        Mat  safe_area = cvCloneImage(mask_iris) ;
         cvRectangle(safe_area,cvPoint(0,0),cvPoint(safe_area->width-1,rPupil.getCenter().y),cvScalar(0),-1) ;
         cvRectangle(safe_area,cvPoint(0,rPupil.getCenter().y+rPupil.getRadius()),
                                       cvPoint(safe_area->width-1,safe_area->height-1),cvScalar(0),-1) ;
@@ -300,7 +300,7 @@ namespace osiris
         // Compute the mean and the variance of iris texture inside safe area
         //double iris_mean = cvMean(pSrc,safe_area) ;
 		CvScalar iris_mean = cvAvg(pSrc, safe_area);
-        IplImage * variance = cvCreateImage(cvGetSize(pSrc),IPL_DEPTH_32F,1) ;
+        Mat  variance = cvCreateImage(cvGetSize(pSrc),IPL_DEPTH_32F,1) ;
         cvConvert(pSrc,variance) ;
         //cvSubS(variance,cvScalar(iris_mean),variance,safe_area) ;
 		cvSubS(variance, iris_mean, variance, safe_area);
@@ -312,14 +312,14 @@ namespace osiris
         cvReleaseImage(&safe_area) ;
 
         // Build mask of noise : |I-mean| > 2.35 * variance
-        IplImage * mask_noise = cvCloneImage(pSrc) ;
+        Mat  mask_noise = cvCloneImage(pSrc) ;
         //cvAbsDiffS(pSrc,mask_noise,cvScalar(iris_mean)) ;
 		cvAbsDiffS(pSrc, mask_noise, iris_mean);
         cvThreshold(mask_noise,mask_noise,2.35*iris_variance,255,CV_THRESH_BINARY) ;
         cvAnd(mask_iris,mask_noise,mask_noise) ;
 
         // Fusion with accurate contours
-        IplImage * accurate_contours = cvCloneImage(mask_iris) ;
+        Mat  accurate_contours = cvCloneImage(mask_iris) ;
         struct_element = cvCreateStructuringElementEx(3,3,1,1,CV_SHAPE_ELLIPSE) ;
         cvMorphologyEx(accurate_contours,accurate_contours,accurate_contours,struct_element,CV_MOP_GRADIENT) ;
         cvReleaseStructuringElement(&struct_element) ;
@@ -337,8 +337,8 @@ namespace osiris
 
 
 
-    void OsiProcessings::normalize ( const IplImage * pSrc ,
-                                           IplImage * pDst ,
+    void OsiProcessings::normalize ( const Mat  pSrc ,
+                                           Mat  pDst ,
                                      const OsiCircle & rPupil ,
                                      const OsiCircle & rIris )
     {
@@ -381,8 +381,8 @@ namespace osiris
     }
 
 	// TODO : changer cette fonction pour normalisation avec contours
-    void OsiProcessings::normalizeFromContour ( const IplImage * pSrc ,
-												      IplImage * pDst ,
+    void OsiProcessings::normalizeFromContour ( const Mat  pSrc ,
+												      Mat  pDst ,
 											    const OsiCircle & rPupil ,
 												const OsiCircle & rIris ,
 												const vector<float> rThetaCoarsePupil ,
@@ -467,8 +467,8 @@ namespace osiris
 	}
 
 
-    void OsiProcessings::encode ( const IplImage * pSrc ,
-                                        IplImage * pDst ,
+    void OsiProcessings::encode ( const Mat  pSrc ,
+                                        Mat  pDst ,
                                   const vector<CvMat*> & rFilters )
     {
         // Compute the maximum width of the filters        
@@ -479,11 +479,11 @@ namespace osiris
         max_width = (max_width-1)/2 ;
         
         // Add wrapping borders on the left and right of image for convolution
-        IplImage * resized = addBorders(pSrc,max_width) ;
+        Mat  resized = addBorders(pSrc,max_width) ;
 
         // Temporary images to store the result of convolution
-        IplImage * img1 = cvCreateImage(cvGetSize(resized),IPL_DEPTH_32F,1) ;
-        IplImage * img2 = cvCreateImage(cvGetSize(resized),pDst->depth,1) ;
+        Mat  img1 = cvCreateImage(cvGetSize(resized),IPL_DEPTH_32F,1) ;
+        Mat  img2 = cvCreateImage(cvGetSize(resized),pDst->depth,1) ;
         
         // Loop on filters
         for ( int f = 0 ; f < rFilters.size() ; f++ )
@@ -510,17 +510,17 @@ namespace osiris
 
 
 
-    float OsiProcessings::match ( const IplImage * image1 ,
-                                  const IplImage * image2 ,
-                                  const IplImage * mask )
+    float OsiProcessings::match ( const Mat  image1 ,
+                                  const Mat  image2 ,
+                                  const Mat  mask )
     {    
         // Temporary matrix to store the XOR result
-        IplImage * result = cvCreateImage(cvGetSize(image1),IPL_DEPTH_8U,1) ;
+        Mat  result = cvCreateImage(cvGetSize(image1),IPL_DEPTH_8U,1) ;
         cvSet(result,cvScalar(0)) ;
         
         // Add borders on the image1 in order to shift it
         int shift = 10 ;
-        IplImage * shifted = addBorders(image1,shift) ;
+        Mat  shifted = addBorders(image1,shift) ;
 
         // The minimum score will be returned
         float score = 1 ;
@@ -565,11 +565,11 @@ namespace osiris
 
 
     // Add left and right borders on an unwrapped image
-    IplImage * OsiProcessings::addBorders ( const IplImage * pImage ,
+    Mat  OsiProcessings::addBorders ( const Mat  pImage ,
                                                   int width )
     {
         // Result image
-        IplImage * result = cvCreateImage(cvSize(pImage->width+2*width,pImage->height),pImage->depth,pImage->nChannels) ;
+        Mat  result = cvCreateImage(cvSize(pImage->width+2*width,pImage->height),pImage->depth,pImage->nChannels) ;
         
         // Copy the image in the center
         cvCopyMakeBorder(pImage,result,cvPoint(width,0),IPL_BORDER_REPLICATE,cvScalarAll(0)) ;    
@@ -591,7 +591,7 @@ namespace osiris
 
 
     // Detect and locate a pupil inside an eye image
-    void OsiProcessings::detectPupil ( const IplImage * pSrc ,
+    void OsiProcessings::detectPupil ( const Mat  pSrc ,
                                              OsiCircle & rPupil ,
                                              int minPupilDiameter ,
                                              int maxPupilDiameter )
@@ -643,7 +643,7 @@ namespace osiris
 
         // Resize image (downsample)
         float scale = (float) OSI_SMALLEST_PUPIL / minPupilDiameter ;
-        IplImage * resized = cvCreateImage(cvSize(pSrc->width*scale,pSrc->height*scale),pSrc->depth,1) ;
+        Mat  resized = cvCreateImage(cvSize(pSrc->width*scale,pSrc->height*scale),pSrc->depth,1) ;
         cvResize(pSrc,resized) ;
 
         // Rescale sizes
@@ -655,23 +655,23 @@ namespace osiris
         minPupilDiameter += ( minPupilDiameter % 2 ) ? 0 : -1 ;
 
         // Fill holes
-        IplImage * filled = cvCreateImage(cvGetSize(resized),resized->depth,1) ;
+        Mat  filled = cvCreateImage(cvGetSize(resized),resized->depth,1) ;
         fillWhiteHoles(resized,filled) ;
 
         // Gradients in horizontal direction
-        IplImage * gh = cvCreateImage(cvGetSize(filled),IPL_DEPTH_32F,1) ;
+        Mat  gh = cvCreateImage(cvGetSize(filled),IPL_DEPTH_32F,1) ;
         cvSobel(filled,gh,1,0) ;
 
         // Gradients in vertical direction
-        IplImage * gv = cvCreateImage(cvGetSize(filled),IPL_DEPTH_32F,1) ;
+        Mat  gv = cvCreateImage(cvGetSize(filled),IPL_DEPTH_32F,1) ;
         cvSobel(filled,gv,0,1) ;
 
         // Normalize gradients
-        IplImage * gh2 = cvCreateImage(cvGetSize(filled),IPL_DEPTH_32F,1) ;
+        Mat  gh2 = cvCreateImage(cvGetSize(filled),IPL_DEPTH_32F,1) ;
         cvMul(gh,gh,gh2) ;
-        IplImage * gv2 = cvCreateImage(cvGetSize(filled),IPL_DEPTH_32F,1) ;
+        Mat  gv2 = cvCreateImage(cvGetSize(filled),IPL_DEPTH_32F,1) ;
         cvMul(gv,gv,gv2) ;
-        IplImage * gn = cvCreateImage(cvGetSize(filled),IPL_DEPTH_32F,1) ;        
+        Mat  gn = cvCreateImage(cvGetSize(filled),IPL_DEPTH_32F,1) ;        
         cvAdd(gh2,gv2,gn) ;
         cvPow(gn,gn,0.5) ;
         cvDiv(gh,gn,gh) ;
@@ -776,15 +776,15 @@ namespace osiris
 
 
     // Morphological reconstruction
-    void OsiProcessings::reconstructMarkerByMask ( const IplImage * pMarker ,
-                                                   const IplImage * pMask ,
-                                                         IplImage * pDst )
+    void OsiProcessings::reconstructMarkerByMask ( const Mat  pMarker ,
+                                                   const Mat  pMask ,
+                                                         Mat  pDst )
     {
         // Temporary image that will inform about marker evolution
-        IplImage * difference = cvCloneImage(pMask) ;
+        Mat  difference = cvCloneImage(pMask) ;
 
         // :WARNING: if user calls f(x,y,y) instead of f(x,y,z), the mask MUST be cloned before processing
-        IplImage * mask = cvCloneImage(pMask) ;
+        Mat  mask = cvCloneImage(pMask) ;
 
         // Copy the marker
         cvCopy(pMarker,pDst) ;
@@ -820,8 +820,8 @@ namespace osiris
 
 
     // Fill the white holes surrounded by dark pixels, such as specular reflection inside pupil area
-    void OsiProcessings::fillWhiteHoles ( const IplImage * pSrc ,
-                                                IplImage * pDst )
+    void OsiProcessings::fillWhiteHoles ( const Mat  pSrc ,
+                                                Mat  pDst )
     {
         int width , height ;
         if ( pSrc->roi )
@@ -836,19 +836,19 @@ namespace osiris
         }
 
         // Mask for reconstruction : pSrc + borders=0
-        IplImage * mask = cvCreateImage(cvSize(width+2,height+2),pSrc->depth,1) ;
+        Mat  mask = cvCreateImage(cvSize(width+2,height+2),pSrc->depth,1) ;
         cvZero(mask) ;
         cvSetImageROI(mask,cvRect(1,1,width,height)) ;
         cvCopy(pSrc,mask) ;
         cvResetImageROI(mask) ;
 
         // Marker for reconstruction : all=0 + borders=255
-        IplImage * marker = cvCloneImage(mask) ;
+        Mat  marker = cvCloneImage(mask) ;
         cvZero(marker) ;
         cvRectangle(marker,cvPoint(1,1),cvPoint(width+1,height+1),cvScalar(255)) ;
 
         // Temporary result of reconstruction
-        IplImage * result = cvCloneImage(mask) ;
+        Mat  result = cvCloneImage(mask) ;
 
         // Morphological reconstruction
         reconstructMarkerByMask(marker,mask,result) ;
@@ -867,18 +867,18 @@ namespace osiris
 
 
     // Rescale between 0 and 255, and show image
-    void OsiProcessings::showImage ( const IplImage * pImage ,
+    void OsiProcessings::showImage ( const Mat  pImage ,
                                            int delay ,
                                      const string & rWindowName )
     {
-        IplImage * show ;
+        Mat  show ;
 
         if ( pImage->nChannels == 1 )
         {
             // Rescale between 0 and 255 by computing : (X-min)/(max-min)
             double min_val , max_val ;
             cvMinMaxLoc(pImage,&min_val,&max_val) ;
-            IplImage * scaled = cvCloneImage(pImage) ;
+            Mat  scaled = cvCloneImage(pImage) ;
             cvScale(pImage,scaled,255/(max_val-min_val),-min_val/(max_val-min_val)) ;
 
             // Convert into 8-bit
@@ -906,14 +906,14 @@ namespace osiris
 
 
     // Unwrap a ring into a rectangular band
-    IplImage * OsiProcessings::unwrapRing ( const IplImage * pSrc ,
+    Mat  OsiProcessings::unwrapRing ( const Mat  pSrc ,
                                             const CvPoint & rCenter ,
                                                   int minRadius ,
                                                   int maxRadius ,
                                             const vector<float> & rTheta )
     {
         // Result image
-        IplImage * result = cvCreateImage(cvSize(rTheta.size(),maxRadius-minRadius+1),pSrc->depth,1) ;
+        Mat  result = cvCreateImage(cvSize(rTheta.size(),maxRadius-minRadius+1),pSrc->depth,1) ;
         cvZero(result) ;
 
         // Loop on columns of normalized image
@@ -940,15 +940,15 @@ namespace osiris
 
 
     // Smooth the image by anisotropic smoothing (Gross & Brajovic,2003)
-    void OsiProcessings::processAnisotropicSmoothing ( const IplImage * pSrc ,
-                                                             IplImage * pDst ,
+    void OsiProcessings::processAnisotropicSmoothing ( const Mat  pSrc ,
+                                                             Mat  pDst ,
                                                              int iterations ,
                                                              float lambda )
     {
         // Temporary float images
-        IplImage * tfs = cvCreateImage(cvGetSize(pSrc),IPL_DEPTH_32F,1) ;
+        Mat  tfs = cvCreateImage(cvGetSize(pSrc),IPL_DEPTH_32F,1) ;
         cvConvert(pSrc,tfs) ;
-        IplImage * tfd = cvCreateImage(cvGetSize(pSrc),IPL_DEPTH_32F,1) ;        
+        Mat  tfd = cvCreateImage(cvGetSize(pSrc),IPL_DEPTH_32F,1) ;        
         cvConvert(pSrc,tfd) ;
 
         // Make borders dark
@@ -1060,10 +1060,10 @@ namespace osiris
 
 
     // Compute vertical gradients using Sobel operator
-    void OsiProcessings::computeVerticalGradients ( const IplImage * pSrc , IplImage * pDst )
+    void OsiProcessings::computeVerticalGradients ( const Mat  pSrc , Mat  pDst )
     {
         // Float values for Sobel
-        IplImage * result_sobel = cvCreateImage(cvGetSize(pSrc),IPL_DEPTH_32F,1) ;
+        Mat  result_sobel = cvCreateImage(cvGetSize(pSrc),IPL_DEPTH_32F,1) ;
         
         // Sobel filter in vertical direction
         cvSobel(pSrc,result_sobel,0,1) ;
@@ -1087,14 +1087,14 @@ namespace osiris
 
 
     // Run viterbi algorithm on gradient (or probability) image and find optimal path
-    void OsiProcessings::runViterbi ( const IplImage * pSrc , vector<int> & rOptimalPath )
+    void OsiProcessings::runViterbi ( const Mat  pSrc , vector<int> & rOptimalPath )
     {
         // Initialize the output
         rOptimalPath.clear() ;
         rOptimalPath.resize(pSrc->width) ;
         
         // Initialize cost matrix to zero
-        IplImage * cost = cvCreateImage(cvGetSize(pSrc),IPL_DEPTH_32F,1) ;
+        Mat  cost = cvCreateImage(cvGetSize(pSrc),IPL_DEPTH_32F,1) ;
         cvZero(cost) ;
 
         // Forward process : build the cost matrix
@@ -1192,19 +1192,19 @@ namespace osiris
 
 
     // Find a contour in image using Viterbi algorithm and anisotropic smoothing
-    vector<CvPoint> OsiProcessings::findContour ( const IplImage * pSrc ,
+    vector<CvPoint> OsiProcessings::findContour ( const Mat  pSrc ,
                                                   const CvPoint & rCenter ,
                                                   const vector<float> & rTheta ,
                                                         int minRadius ,
                                                         int maxRadius ,
-                                                  const IplImage * pMask )
+                                                  const Mat  pMask )
     {
         // Output
         vector<CvPoint> contour ;
         contour.resize(rTheta.size()) ;
 
         // Unwrap the image
-        IplImage * unwrapped = unwrapRing(pSrc,rCenter,minRadius,maxRadius,rTheta) ;
+        Mat  unwrapped = unwrapRing(pSrc,rCenter,minRadius,maxRadius,rTheta) ;
 
         // Smooth image
         processAnisotropicSmoothing(unwrapped,unwrapped,100,1) ;
@@ -1215,8 +1215,8 @@ namespace osiris
         // Take into account the mask
         if ( pMask )
         {
-            IplImage * mask_unwrapped = unwrapRing(pMask,rCenter,minRadius,maxRadius,rTheta) ;
-            IplImage * temp = cvCloneImage(unwrapped) ;
+            Mat  mask_unwrapped = unwrapRing(pMask,rCenter,minRadius,maxRadius,rTheta) ;
+            Mat  temp = cvCloneImage(unwrapped) ;
             cvZero(unwrapped) ;
             cvCopy(temp,unwrapped,mask_unwrapped) ;
             cvReleaseImage(&temp) ;
@@ -1241,7 +1241,7 @@ namespace osiris
 
 
     // Draw a contour (vector of CvPoint) on an image
-    void OsiProcessings::drawContour ( IplImage * pImage , const vector<CvPoint> & rContour , const CvScalar & rColor , int thickness )
+    void OsiProcessings::drawContour ( Mat  pImage , const vector<CvPoint> & rContour , const CvScalar & rColor , int thickness )
     {
         // Draw INSIDE the contour if thickness is negative
         if ( thickness < 0 )
@@ -1260,7 +1260,7 @@ namespace osiris
         else
         {
             // Draw the contour on binary mask
-            IplImage * mask = cvCreateImage(cvGetSize(pImage),IPL_DEPTH_8U,1) ;
+            Mat  mask = cvCreateImage(cvGetSize(pImage),IPL_DEPTH_8U,1) ;
             cvZero(mask) ;
             for ( int i = 0 ; i < rContour.size() ; i++ )
             {

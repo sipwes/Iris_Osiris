@@ -84,7 +84,7 @@ namespace osiris
     ////////////
 
 
-    void OsiCircle::drawCircle ( IplImage * pImage , const CvScalar & rColor , int thickness )
+    void OsiCircle::drawCircle ( Mat  pImage , const CvScalar & rColor , int thickness )
     {
         cvCircle(pImage,mCenter,mRadius,rColor,thickness) ;
     }

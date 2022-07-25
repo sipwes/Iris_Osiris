@@ -49,7 +49,7 @@ namespace osiris
     // Functions for loading images and parameters
     //////////////////////////////////////////////
 
-    void OsiEye::loadImage ( const string & rFilename , IplImage ** ppImage )
+    void OsiEye::loadImage ( const string & rFilename , Mat* ppImage )
     {
         // :WARNING: ppImage is a pointer of pointer
         try
@@ -172,7 +172,7 @@ namespace osiris
 
 
 
-    void OsiEye::saveImage ( const string & rFilename , const IplImage * pImage )
+    void OsiEye::saveImage ( const string & rFilename , const Mat  pImage )
     {
         // :TODO: no exception here, but 2 error messages
         // 1. pImage does NOT exist => "image was neither comptued nor loaded"
@@ -315,7 +315,7 @@ namespace osiris
         op.segment(mpOriginalImage,mpMask,mPupil,mIris,mThetaCoarsePupil,mThetaCoarseIris,mCoarsePupilContour,mCoarseIrisContour,minIrisDiameter,minPupilDiameter,maxIrisDiameter,maxPupilDiameter) ;
 
         // Draw on segmented image
-        IplImage * tmp = cvCloneImage(mpMask) ;
+        Mat  tmp = cvCloneImage(mpMask) ;
         cvZero(tmp) ;
         cvCircle(tmp,mIris.getCenter(),mIris.getRadius(),cvScalar(255),-1) ;
         cvCircle(tmp,mPupil.getCenter(),mPupil.getRadius(),cvScalar(0),-1) ;
@@ -413,13 +413,13 @@ namespace osiris
         }
 
         // Build the total mask = mask1 * mask2 * points    
-        IplImage * temp = cvCreateImage(cvGetSize(pApplicationPoints),mpIrisCode->depth,1) ;
+        Mat  temp = cvCreateImage(cvGetSize(pApplicationPoints),mpIrisCode->depth,1) ;
         cvSet(temp,cvScalar(0)) ;
         cvAnd(mpNormalizedMask,rEye.mpNormalizedMask,temp,pApplicationPoints) ;
 
         // Copy the mask f times, where f correspond to the number of codes (= number of filters)
         int n_codes = mpIrisCode->height / pApplicationPoints->height ;
-        IplImage * total_mask = cvCreateImage(cvGetSize(mpIrisCode),IPL_DEPTH_8U,1) ;
+        Mat  total_mask = cvCreateImage(cvGetSize(mpIrisCode),IPL_DEPTH_8U,1) ;
         for ( int n = 0 ; n < n_codes ; n++ )
         {
             cvSetImageROI(total_mask,cvRect(0,n*pApplicationPoints->height,pApplicationPoints->width,pApplicationPoints->height)) ;

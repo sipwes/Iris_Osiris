@@ -63,8 +63,8 @@ namespace osiris
         * @return void
         * @see detectPupil() , findContour() , OsiCircle::computeCircleFitting() , normalize() , OsiEye::segment()
         */
-		void segment ( const IplImage * pSrc ,
-							 IplImage * pMask ,
+		void segment ( const Mat  pSrc ,
+							 Mat  pMask ,
 							 OsiCircle & rPupil ,
 							 OsiCircle & rIris ,
 							 std::vector<float> & rThetaCoarsePupil ,
@@ -87,7 +87,7 @@ namespace osiris
         * @return void
         * @see normalizeFromContour() , segment() , encode() , OsiEye::normalize()
         */
-        void normalize ( const IplImage * pSrc , IplImage * pDst , const OsiCircle & rPupil , const OsiCircle & rIris ) ;
+        void normalize ( const Mat  pSrc , Mat  pDst , const OsiCircle & rPupil , const OsiCircle & rIris ) ;
 
 
 
@@ -100,8 +100,8 @@ namespace osiris
         * @return void
         * @see normalize() , segment() , encode() , OsiEye::normalize()
         */
-		void normalizeFromContour ( const IplImage * pSrc ,
-										  IplImage * pDst ,
+		void normalizeFromContour ( const Mat  pSrc ,
+										  Mat  pDst ,
 									const OsiCircle & rPupil ,
 									const OsiCircle & rIris ,
 									const std::vector<float> rThetaCoarsePupil ,
@@ -122,7 +122,7 @@ namespace osiris
         * @return void
         * @see normalize() , match() , OsiEye::encode()
         */
-        void encode ( const IplImage * pSrc , IplImage * pDst , const std::vector<CvMat*> & rFilters ) ;
+        void encode ( const Mat  pSrc , Mat  pDst , const std::vector<CvMat*> & rFilters ) ;
 
 
 
@@ -133,7 +133,7 @@ namespace osiris
         * @return The macthing score between 0 (completely similar) and 1 (completely different)
         * @see encode() , OsiEye::match()
         */
-        float match ( const IplImage * image1 , const IplImage * image2 , const IplImage * mask ) ;
+        float match ( const Mat  image1 , const Mat  image2 , const Mat  mask ) ;
 
 
 
@@ -147,7 +147,7 @@ namespace osiris
         * @return The new image
         * @see match() , encode()
         */
-        IplImage * addBorders ( const IplImage * pImage , int width ) ;
+        Mat  addBorders ( const Mat  pImage , int width ) ;
 
 
 
@@ -168,7 +168,7 @@ namespace osiris
         * @return void
         * @see fillWhiteHoles()
         */
-        void reconstructMarkerByMask ( const IplImage * pMarker , const IplImage * pMask , IplImage * pDst ) ;
+        void reconstructMarkerByMask ( const Mat  pMarker , const Mat  pMask , Mat  pDst ) ;
 
 
 
@@ -178,7 +178,7 @@ namespace osiris
         * @return void
         * @see reconstructMarkerByMask()
         */
-        void fillWhiteHoles ( const IplImage * pSrc , IplImage * pDst ) ;
+        void fillWhiteHoles ( const Mat  pSrc , Mat  pDst ) ;
 
 
 
@@ -191,7 +191,7 @@ namespace osiris
         * @return void
         * @see segment() , fillWhiteHoles()
         */
-        void detectPupil ( const IplImage * pSrc , OsiCircle & rPupil , int minPupilDiameter = OSI_SMALLEST_PUPIL , int maxPupilDiameter = 0 ) ;
+        void detectPupil ( const Mat  pSrc , OsiCircle & rPupil , int minPupilDiameter = OSI_SMALLEST_PUPIL , int maxPupilDiameter = 0 ) ;
 
 
 
@@ -201,7 +201,7 @@ namespace osiris
         * @param rWindowName The window name
         * @return void
         */
-        void showImage ( const IplImage * pImage , int delay = 0 , const std::string & rWindowName = "Show image" ) ;
+        void showImage ( const Mat  pImage , int delay = 0 , const std::string & rWindowName = "Show image" ) ;
 
 
 
@@ -214,7 +214,7 @@ namespace osiris
         * @return The unwrapped ring
         * @see findContour() , runViterbi() , convertPolarToCartesian()
         */
-        IplImage * unwrapRing ( const IplImage * pSrc , const CvPoint & rCenter , int minRadius , int maxRadius , const std::vector<float> & rTheta ) ;
+        Mat  unwrapRing ( const Mat  pSrc , const CvPoint & rCenter , int minRadius , int maxRadius , const std::vector<float> & rTheta ) ;
 
 
 
@@ -226,7 +226,7 @@ namespace osiris
         * @return void
         * @see segment()
         */
-        void processAnisotropicSmoothing ( const IplImage * pSrc , IplImage * pDst , int iterations = 100 , float lambda = 1 ) ;
+        void processAnisotropicSmoothing ( const Mat  pSrc , Mat  pDst , int iterations = 100 , float lambda = 1 ) ;
 
 
 
@@ -236,7 +236,7 @@ namespace osiris
         * @return void
         * @see findContour()
         */
-        void computeVerticalGradients ( const IplImage * pSrc , IplImage * pDst ) ;
+        void computeVerticalGradients ( const Mat  pSrc , Mat  pDst ) ;
 
 
 
@@ -250,7 +250,7 @@ namespace osiris
         * @see convertPolarToCartesian()
         * @see findContour()
         */
-        void runViterbi ( const IplImage * pSrc , std::vector<int> & rOptimalPath ) ;
+        void runViterbi ( const Mat  pSrc , std::vector<int> & rOptimalPath ) ;
 
 
 
@@ -264,7 +264,7 @@ namespace osiris
         * @return The contour
         * @see runViterbi() , unwrapRing()
         */
-        std::vector<CvPoint> findContour ( const IplImage * pSrc , const CvPoint & rCenter , const std::vector<float> & rTheta , int minRadius , int maxRadius , const IplImage * pMask = 0 ) ;
+        std::vector<CvPoint> findContour ( const Mat  pSrc , const CvPoint & rCenter , const std::vector<float> & rTheta , int minRadius , int maxRadius , const Mat  pMask = 0 ) ;
 
 
 
@@ -275,7 +275,7 @@ namespace osiris
         * @param thickness The contour thickness
         * @return void
         */
-        void drawContour ( IplImage * pImage , const std::vector<CvPoint> & rContour , const CvScalar & rColor = cvScalar(255) , int thickness = 1 ) ;
+        void drawContour ( Mat  pImage , const std::vector<CvPoint> & rContour , const CvScalar & rColor = cvScalar(255) , int thickness = 1 ) ;
     
 
     } ; // end of class
