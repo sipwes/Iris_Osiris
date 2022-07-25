@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\cv310\opencv\build\include\opencv;D:\cv310\opencv\build\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\cv310\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\DevTools\opencv\3.4.16\opencv\build\include\opencv;D:\DevTools\opencv\3.4.16\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\DevTools\opencv\3.4.16\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>D:\cv310\opencv\build\include\opencv;D:\cv310\opencv\build\include;$(IncludePath)</IncludePath>

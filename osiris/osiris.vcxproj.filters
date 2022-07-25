@@ -15,36 +15,36 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Iris_Osiris-master\src\OsiCircle.h">
+    <ClInclude Include="..\src\OsiCircle.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Iris_Osiris-master\src\OsiEye.h">
+    <ClInclude Include="..\src\OsiEye.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Iris_Osiris-master\src\OsiManager.h">
+    <ClInclude Include="..\src\OsiManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Iris_Osiris-master\src\OsiProcessings.h">
+    <ClInclude Include="..\src\OsiProcessings.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Iris_Osiris-master\src\OsiStringUtils.h">
+    <ClInclude Include="..\src\OsiStringUtils.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Iris_Osiris-master\src\OsiCircle.cpp">
+    <ClCompile Include="..\src\OsiCircle.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\Iris_Osiris-master\src\OsiEye.cpp">
+    <ClCompile Include="..\src\OsiEye.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\Iris_Osiris-master\src\OsiMain.cpp">
+    <ClCompile Include="..\src\OsiMain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\Iris_Osiris-master\src\OsiManager.cpp">
+    <ClCompile Include="..\src\OsiManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\Iris_Osiris-master\src\OsiProcessings.cpp">
+    <ClCompile Include="..\src\OsiProcessings.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
