@@ -2,3 +2,4 @@
 build/
 !.gitignore
 .vs
+x64
